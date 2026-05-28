@@ -1,0 +1,14 @@
+python-dotenv==1.0.1
+streamlit==1.37.1
+langchain==0.2.14
+langchain-community==0.2.12
+langchain-core==0.2.35
+langchain-google-genai==1.0.10
+langchain-text-splitters==0.2.2
+google-generativeai==0.7.2
+sentence-transformers==3.0.1
+faiss-cpu==1.8.0.post1
+pypdf==4.3.1
+pandas==2.2.2
+numpy==1.26.4
+pytest==8.3.2
