@@ -11,8 +11,6 @@ The project combines:
 - Retrieval-Augmented Generation (RAG)
 - Conversational AI
 
----
-
 ## Features
 
 - Multi-PDF upload
@@ -23,8 +21,6 @@ The project combines:
 - Document summarization
 - Flashcard generation
 - Retrieval confidence scoring
-
----
 
 ## Tech Stack
 
@@ -44,8 +40,6 @@ The project combines:
 - NumPy
 - Pandas
 - dotenv
-
----
 
 ## How It Works
 
@@ -79,8 +73,6 @@ When a user asks a question:
 1. Relevant chunks are retrieved from the uploaded PDFs
 2. Retrieved context is sent to Gemini
 3. The model generates a grounded response using only the retrieved content
-
----
 
 ## Installation
 
@@ -117,8 +109,6 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
----
-
 ## Environment Variables
 
 Create a `.env` file in the root directory:
@@ -136,8 +126,6 @@ CHUNK_OVERLAP=200
 TOP_K=5
 ```
 
----
-
 ## Running the App
 
 Start the Streamlit server:
@@ -148,8 +136,6 @@ streamlit run app.py
 
 The app will open in your browser.
 
----
-
 ## Using the App
 
 1. Upload one or more PDF files
@@ -158,69 +144,20 @@ The app will open in your browser.
 4. View citations and retrieved sources
 5. Generate summaries or flashcards if needed
 
----
-
-## Example Queries
-
-- Explain binary search and its time complexity
-- Summarize the uploaded document
-- What are the key differences between BFS and DFS?
-- Generate flashcards for important concepts
-- Which page discusses dynamic programming?
-
----
-
-## Project Structure
-
-```text
-documind-rag-chatbot/
-│
-├── app.py
-├── requirements.txt
-├── README.md
-├── .env.example
-│
-├── src/
-│   ├── config.py
-│   ├── pdf_loader.py
-│   ├── text_splitter.py
-│   ├── embeddings.py
-│   ├── vector_database.py
-│   ├── retriever.py
-│   ├── prompt_templates.py
-│   ├── rag_pipeline.py
-│   ├── summarizer.py
-│   ├── flashcard_generator.py
-│   └── utils.py
-│
-├── tests/
-│
-├── data/
-│
-└── vector_store/
-```
-
----
-
 ## Core Concepts
 
 ### Retrieval-Augmented Generation (RAG)
 
 Instead of relying only on the LLM’s internal knowledge, the system first retrieves relevant document chunks and uses them as context for answer generation.
 
----
 
 ### Embeddings
 
 Text is converted into dense vector representations using Sentence Transformers so semantically similar content can be retrieved efficiently.
 
----
-
 ### FAISS
 
 FAISS is used for storing and searching embeddings using vector similarity.
-
----
 
 ### Hybrid Retrieval
 
@@ -229,8 +166,6 @@ The retriever combines:
 - Keyword matching
 
 This improves retrieval quality for technical and academic documents.
-
----
 
 ## Testing
 
