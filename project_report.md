@@ -1,62 +1,60 @@
 # Project Report: DocuMind
 
-## 1. Project Overview
-**DocuMind** is a sophisticated, interactive Retrieval-Augmented Generation (RAG) chatbot designed to enable users to "converse" with their PDF documents using natural language. By uploading one or more PDFs, users can ask questions and receive accurate, citation-aware answers generated entirely from the content of their uploaded documents.
+## 1. Abstract
 
-The core motivation behind DocuMind is to simplify information retrieval from dense documents, making it easier for users to study, research, and extract knowledge without needing to manually read through pages of text.
+DocuMind is an interactive Retrieval-Augmented Generation (RAG) chatbot designed to allow users to interact with their PDF documents using natural language. Unlike traditional LLMs that rely solely on their training data, DocuMind utilizes a hybrid retrieval approach and the Google Gemini API to generate accurate, citation-aware answers strictly grounded in the content of the uploaded documents. The system provides an end-to-end pipeline covering document extraction, chunking, dense vector embeddings, and a user-friendly conversational interface that also incorporates automated document summarization and flashcard generation.
 
-## 2. Key Features
-- **Multi-PDF Upload:** Users can upload multiple PDF documents simultaneously to build a comprehensive knowledge base.
-- **Conversational Chat Interface:** A user-friendly chat UI built with Streamlit for asking natural language questions.
-- **Citation-Aware Responses:** Answers are grounded in the uploaded documents and include citations to the exact sources and pages.
-- **Hybrid Retrieval System:** Combines semantic similarity search with keyword matching for highly accurate context retrieval, especially useful for technical and academic texts.
-- **Retrieval Confidence Scoring:** Displays semantic and keyword scores, providing transparency into the reliability of the retrieved context.
-- **Study Tools:**
-  - **Document Summarization:** Automatically generates comprehensive summaries of the uploaded knowledge base.
-  - **Flashcard Generation:** Automatically generates question-and-answer revision flashcards from the text to aid in studying.
+## 2. Introduction & Motivation
 
-## 3. Technology Stack
-The application is built using modern AI and web development libraries:
-- **Frontend / UI:** [Streamlit](https://streamlit.io/) for a reactive, pure-Python web interface.
-- **LLM / AI:** [Google Gemini API](https://ai.google.dev/) for generating grounded answers, summaries, and flashcards.
-- **Vector Search & Embeddings:** 
-  - **FAISS** (Facebook AI Similarity Search) for efficient storage and similarity search of document vectors.
-  - **Sentence Transformers** (`all-MiniLM-L6-v2`) for generating dense vector representations of text.
-- **Orchestration & NLP Utilities:**
-  - **LangChain** concepts applied for structuring the pipeline.
-  - **PyPDF** for extracting text from PDF files.
-- **Data Handling:** NumPy, Pandas for numerical and tabular operations.
+As the volume of digital documents grows, manually extracting specific information from dense PDFs becomes increasingly time-consuming and error-prone. General-purpose LLMs struggle to answer questions about specific, private, or novel documents due to their lack of access to this localized context, often leading to hallucinations.
 
-## 4. System Architecture
-DocuMind utilizes a standard RAG architecture enhanced with hybrid retrieval and study tools.
+This project introduces a RAG-based solution that addresses these challenges by:
+- Enabling targeted semantic search over multiple uploaded documents.
+- Generating trustworthy responses by injecting relevant retrieved context into the LLM prompt.
+- Fostering an interactive learning environment through automatic summarization and study flashcards.
 
-### 4.1. Ingestion Pipeline
-1. **Document Loading (`pdf_loader.py`):** Extracts raw text from uploaded PDF files.
-2. **Text Splitting / Chunking (`text_splitter.py`):** Splits the raw text into manageable chunks (e.g., 1000 characters with 200 character overlap) to preserve context while ensuring chunks fit into the embedding model's context window.
-3. **Embedding (`embeddings.py`):** Converts the text chunks into dense mathematical vectors using Sentence Transformers.
-4. **Vector Database (`vector_database.py`):** Indexes and stores the chunks and their vectors using FAISS.
+The resulting system operates in a complete pipeline: ingesting text, indexing embeddings, retrieving context upon query, and generating grounded answers.
 
-### 4.2. Retrieval & Generation Pipeline
-1. **User Query:** The user enters a question in the Streamlit interface.
-2. **Hybrid Retrieval (`retriever.py`):** The query is embedded and compared against the FAISS index. The retriever uses a hybrid approach (Semantic + Keyword scoring) to fetch the top `K` most relevant chunks.
-3. **Prompt Construction (`prompt_templates.py` & `rag_pipeline.py`):** The retrieved chunks are formatted into a context block and combined with the user query into a strict prompt instructing the LLM to only use the provided context.
-4. **LLM Generation:** The Google Gemini model generates a detailed answer along with citations referring to the original documents.
+## 3. System Architecture
 
-### 4.3. Study Tools Generation
-- **Summarizer (`summarizer.py`):** Passes the entire indexed context to Gemini to extract the main ideas and summarize the document.
-- **Flashcard Generator (`flashcard_generator.py`):** Instructs the LLM to identify key definitions and concepts to create structured Q&A cards.
+The architecture separates the data ingestion pipeline from the interactive retrieval system to ensure efficient querying and a responsive user experience.
 
-## 5. UI/UX Design
-The application features a custom-styled Streamlit interface tailored for readability and a premium feel:
-- **Dark Mode Aesthetic:** Custom CSS defines a sleek, modern dark theme with distinct branding (`var(--dm-bg)`, `var(--dm-surface)`).
-- **Responsive Layout:** A side panel manages the Knowledge Base build process and study tools, while the main window handles the interactive chat.
-- **Source Cards:** Retrieved contexts are displayed in expandable UI cards showing the confidence score and an excerpt of the text, ensuring full transparency in the generation process.
+- **Frontend Interface (Streamlit):** A custom-styled, reactive web application that orchestrates file uploads, knowledge base construction, chat history, and the display of retrieved citations.
+- **Ingestion Plane (Document Processing):** Raw text is extracted via PyPDF, dynamically split into overlapping chunks, and converted into dense vector representations using Sentence Transformers (`all-MiniLM-L6-v2`).
+- **Memory Plane (Vector Store):** Utilizes FAISS (Facebook AI Similarity Search) to index the chunk embeddings for rapid similarity retrieval.
+- **Retrieval & Generation Core:** A Hybrid Retriever combines semantic similarity search with keyword matching to fetch the most relevant context. The retrieved chunks are formatted into a prompt and processed by the Google Gemini API to construct a response with high confidence and explicit source citations.
 
-## 6. Setup and Installation
-The project requires Python and can be set up in a virtual environment:
-1. Clone the repository and install dependencies (`pip install -r requirements.txt`).
-2. Configure `.env` with a `GEMINI_API_KEY`.
-3. Launch the application using `streamlit run app.py`.
+## 4. Implementation Details
+
+The system integrates several modular components to facilitate a seamless RAG pipeline:
+
+### 4.1 Document Processing & Chunking
+The `DocumentChunker` (`text_splitter.py`) processes raw extracted text into manageable pieces (e.g., 1000 characters with 200 characters of overlap). This ensures context is preserved across chunk boundaries while remaining within the embedding model's optimal context window.
+
+### 4.2 Vector Database & Hybrid Retrieval
+The `FAISSVectorDatabase` handles the indexing of document vectors. Upon querying, the `HybridRetriever` (`retriever.py`) evaluates both semantic similarity (how closely the meaning aligns) and keyword frequency, scoring and ranking chunks to return the top `K` most relevant sections of the text.
+
+### 4.3 Study Tools Pipeline
+Beyond basic Q&A, the system leverages Gemini to build specialized educational features:
+- **Summarizer (`summarizer.py`):** Compiles the indexed context to produce high-level structural summaries.
+- **Flashcard Generator (`flashcard_generator.py`):** Identifies key definitions and concepts within the text to output formatted question-and-answer revision cards.
+
+## 5. Testing & Evaluation
+
+The project employs a structured test suite (`pytest`) mapped to the `tests/` directory to ensure robust pipeline behavior:
+
+- Unit tests validate the text extraction, chunking logic, and embedding dimensions.
+- The hybrid retriever is evaluated on whether the combined semantic and keyword scoring consistently ranks the most relevant chunks accurately.
+- Retrieval confidence labels and source previews are surfaced directly in the UI, enabling users to independently verify the LLM's answers against the original text.
+
+## 6. Scope & Limitations
+
+DocuMind is an effective tool for interacting with textual PDF data but is currently bounded by the following limitations:
+
+- **Complex Formatting:** The text extraction relies on PyPDF, which may struggle with highly complex multi-column layouts, embedded tables, or image-heavy PDFs lacking Optical Character Recognition (OCR) layers.
+- **Scale Limitations:** FAISS indices are stored locally and kept in memory during the session. While highly efficient for several large documents, it is not designed to scale horizontally across enterprise-level document lakes without a dedicated external vector database backend.
+- **Multi-modal Queries:** The current implementation processes and retrieves purely textual data, meaning visual charts, tables, or diagrams within the PDFs are not interpreted by the LLM.
 
 ## 7. Conclusion
-DocuMind successfully demonstrates how Large Language Models and Vector Databases can be integrated to create powerful document interaction tools. By emphasizing grounded generation (RAG) and hybrid retrieval, it minimizes hallucinations and ensures that the information provided to the user is accurate, verifiable, and highly relevant to their own documents.
+
+DocuMind successfully demonstrates that combining a well-structured hybrid retrieval system with modern LLM capabilities creates a powerful tool for document interaction. By enforcing grounded generation (RAG) and surfacing exact citations, the system drastically reduces hallucinations and builds user trust. The addition of automated study tools further validates the transition from simple semantic search engines to comprehensive, interactive learning applications.
